@@ -1,6 +1,10 @@
 $(document).ready(function () {
 
 
+    let childcount = 1;
+    const maxchildren = 6;
+
+
     $("#phone").on("input", function () {
         let input = $(this).val().split("-").join("");
         let formatted = "";
@@ -16,13 +20,12 @@ $(document).ready(function () {
         $(this).val(formatted);
     });
 
-    $('#ChildName').on('input', function () {
+    $('#child1').on('input', function () {
         const name = $(this).val().trim();
         $(`#order-title`).text(`Uniform Items for ${name || `Uniform Items`}`);
     });
 
-    let childcount = 1;
-    const maxchildren = 6;
+
 
     $('#add-child').on('click', () => {
         if (childcount >= maxchildren) {
@@ -30,11 +33,19 @@ $(document).ready(function () {
             return;
         }
 
+        const lastChildName = $(`#child${childcount}`).val().trim();
+        if (!lastChildName) {
+            alert(`Please enter a name for Child ${childcount} before adding another child.`);
+            return;
+        };
+
         childcount++;
+
+
 
         const newchild = `
         <div class= "extra-child">
-        <label for="ChildName${childcount}">Child ${childcount} Name:</label>
+        <label for="child${childcount}">Child ${childcount} Name:</label>
                 <input type="text" id="child${childcount}" required><br><br>
                 </div>`;
         $('#children').append(newchild);
@@ -110,83 +121,87 @@ $(document).ready(function () {
 
     });
 
+    let children = [];
 
+    function gatherChildren() {
+        children = [];
+        for (let i = 1; i <= childcount; i++) {
+            const childName = $(`#child${i}`).val().trim();
+            if (childName) {
+                const childData = {
+                    childname: childName,
+                    skirts: {
+                        size: $(`#skirtSize${i}`).val(),
+                        quantity: $(`input[name="skirtQuantity${i}"]`).val()
+                    },
+                    shirts: {
+                        size: $(`#shirtSize${i}`).val(),
+                        quantity: $(`input[name="shirtQuantity${i}"]`).val()
+                    },
+                    sweatshirts: {
+                        size: $(`#sweathirtSize${i}`).val(),
+                        quantity: $(`input[name="sweatshirtQuantity${i}"]`).val()
+                    },
+                    jumpers: {
+                        size: $(`#jumperSize${i}`).val(),
+                        quantity: $(`input[name="jumperQuantity${i}"]`).val()
+                    }
+                };
+                children.push(childData);
+            }
+        }
+    }
 
     $('#preorder-form').on('submit', async function (e) {
         e.preventDefault();
-
+        gatherChildren();
 
         const formData = {
             parentname: $('#ParentName').val().trim(),
-
-            childname: $('#ChildName').val().trim(),
-
             lastname: $('#lastName').val().trim(),
-
-            skirts: {
-                size: $('select[name="skirtSize"]').val(),
-                quantity: $('input[name= "skirtQuantity"]').val()
-            },
-
-            shirts: {
-                size: $('select[name="shirtSize"]').val(),
-                quantity: $('input[name= "shirtQuantity"]').val()
-            },
-
-            sweatshirts: {
-                size: $('select[name="sweatshirtSize"]').val(),
-                quantity: $('input[name= "sweatshirtQuantity"]').val()
-            },
-
-            jumpers: {
-                size: $('select[name="jumperSize"]').val(),
-                quantity: $('input[name= "jumperQuantity"]').val()
-            },
-
             phone: $('#phone').val().trim(),
-
-            paid: $('#paid').is(':checked')
+            paid: $('#paid').is(':checked'),
+            children
         };
 
-
-
-        const backdata = {
-            lastname: formData.lastname,
-            mothersname: formData.parentname,
-            childsname: formData.childname,
-            phone: formData.phone,
-            shirt: formData.shirts.quantity > 0 ? formData.shirts.quantity : "",
-            shirtsize: formData.shirts.quantity > 0 ? formData.shirts.size : "",
-            skirt: formData.skirts.quantity > 0 ? formData.skirts.quantity : "",
-            skirtsize: formData.skirts.quantity > 0 ? formData.skirts.size : "",
-            jumper: formData.jumpers.quantity > 0 ? formData.jumpers.quantity : "",
-            jumpersize: formData.jumpers.quantity > 0 ? formData.jumpers.size : "",
-            sweatshirt: formData.sweatshirts.quantity > 0 ? formData.sweatshirts.quantity : "",
-            sweatshirtsize: formData.sweatshirts.quantity > 0 ? formData.sweatshirts.size : "",
-            paid: formData.paid
-        };
-
-
-        try {
-            const response = await fetch('/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(backdata)
-            });
-            if (!response.ok) {
-                throw new Error('something went wrong');
+        for (const child of children) {
+            const backdata = {
+                lastname: $('#lastName').val().trim(),
+                mothersname: $('#ParentName').val().trim(),
+                childsname: child.childname,
+                phone: $('#phone').val().trim(),
+                shirt: child.shirts.quantity > 0 ? child.shirts.quantity : "",
+                shirtsize: child.shirts.quantity > 0 ? child.shirts.size : "",
+                skirt: child.skirts.quantity > 0 ? child.skirts.quantity : "",
+                skirtsize: child.skirts.quantity > 0 ? child.skirts.size : "",
+                jumper: child.jumpers.quantity > 0 ? child.jumpers.quantity : "",
+                jumpersize: child.jumpers.quantity > 0 ? child.jumpers.size : "",
+                sweatshirt: child.sweatshirts.quantity > 0 ? child.sweatshirts.quantity : "",
+                sweatshirtsize: child.sweatshirts.quantity > 0 ? child.sweatshirts.size : "",
+                paid: $('#paid').is(':checked')
             };
-        } catch (error) {
-            console.error('network error');
+
+           
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(backdata)
+                });
+                if (!response.ok) {
+                    throw new Error('something went wrong');
+                }
+            } catch (error) {
+                console.error('Network error', error);
+            }
         }
 
         generatePDF(formData);
         resetFormFields();
-
-    })
-
+    });
 
     function generatePDF(data) {
         const { jsPDF } = window.jspdf;
@@ -270,7 +285,7 @@ $(document).ready(function () {
 
     function resetFormFields() {
         $('#ParentName').val('');
-        $('#ChildName').val('');
+        $('#child1').val('');
         $('#lastName').val('');
         $(`#order-title`).text(`Uniform Items`);
         $('select[name="skirtSize"]').val('');

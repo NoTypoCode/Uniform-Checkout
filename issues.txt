@@ -1,0 +1,6 @@
+when adding in sizes and quantities...If one of them are blank I want it to not show up in google sheets
+need to add extra children to pdf
+
+find fonts for the PDF?
+
+add in price total on bottom (maybe an input that can use for partial payment)
