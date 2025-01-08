@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniform Gemach</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Mrs. Adele Raful Uniform Preorder Form</h1>
+
+        <form id="preorder-form">
+            <div id="info" class="form-group">
+                <label for="ParentName">Mother First Name:</label>
+                <input type="text" id="ParentName" required><br>
+
+                <div id="children" class="children">
+                    <label for="ChildName">Child Name:</label>
+                    <input type="text" id="ChildName" required><br><br>
+                </div>
+                <button id="add-child" type="button">Add Child</button>
+
+                <label for="LastName">Last Name:</label>
+                <input type="text" name="lastname" id="lastName" required> <br><br>
+
+                <label for="phone">Phone Number (texting):</label>
+                <input type="tel" name="phone" id="phone" required><br><br>
+
+            </div>
+
+            <div id="itemsToOrder" class="form-group">
+                <h2 id="order-title">Uniform Items</h2>
+
+                <div class="uniform-item">
+                    <label>Shirts</label>
+                    <select name="shirtSize" id="shirtSize">
+                        <option value="" style="display: none;">Select Size</option>
+                        <option value="4">Size 4</option>
+                        <option value="6">Size 6</option>
+                        <option value="8">Size 8</option>
+                        <option value="10">Size 10</option>
+                        <option value="12">Size 12</option>
+                    </select>
+                    <input type="number" name="shirtQuantity" min="0" max="4" value="0">
+                </div>
+
+
+                <div class="uniform-item">
+                    <label>Skirts</label>
+                    <select name="skirtSize" id="skirtSize">
+                        <option value="" style="display: none;">Select Size</option>
+                        <option value="4">Size 4</option>
+                        <option value="6">Size 6</option>
+                        <option value="8">Size 8</option>
+                        <option value="10">Size 10</option>
+                        <option value="12">Size 12</option>
+                    </select>
+                    <input type="number" name="skirtQuantity" min="0" max="4" value="0">
+                </div>
+
+                <div class="uniform-item">
+                    <label>Sweatshirts</label>
+                    <select name="sweatshirtSize" id="sweathirtSize">
+                        <option value="" style="display: none;">Select Size</option>
+                        <option value="4">Size 4</option>
+                        <option value="6">Size 6</option>
+                        <option value="8">Size 8</option>
+                        <option value="10">Size 10</option>
+                        <option value="12">Size 12</option>
+                    </select>
+                    <input type="number" name="sweatshirtQuantity" min="0" max="4" value="0">
+                </div>
+
+                <div class="uniform-item">
+                    <label>Jumpers</label>
+                    <select name="jumperSize" id="jumperSize">
+                        <option value="" style="display: none;">Select Size</option>
+                        <option value="4">Size 4</option>
+                        <option value="6">Size 6</option>
+                        <option value="8">Size 8</option>
+                        <option value="10">Size 10</option>
+                        <option value="12">Size 12</option>
+                    </select>
+                    <input type="number" name="jumperQuantity" min="0" max="4" value="0">
+                </div>
+            </div>
+
+            <div class="form-group checkbox">
+                <input type="checkbox" name="paid" id="paid">
+                <label for="paid">Paid in full</label>
+            </div>
+            <button type="submit" id="generate-pdf">Generate PDF</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="stampFont.js"></script>
+    <script src="index.js"></script>
+</body>
+
+
+</html>
