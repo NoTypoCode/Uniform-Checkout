@@ -26,17 +26,17 @@ const sheetData = async () => {
 app.post("/", async (req, res) => {
     const { auth, client, googleSheets, spreadsheetId } = await sheetData();
    
-    const { lastname, mothersname, childsname, phone, shirt, shirtsize, skirt, skirtsize, jumper, jumpersize, sweatshirt, sweatshirtsize, paid } = req.body;
+    const { lastname, mothersname, childsname, phone, shirt, shirtsize, skirt, skirtsize, jumper, jumpersize, sweatshirt, sweatshirtsize, paid, partialPayment } = req.body;
 
     await googleSheets.spreadsheets.values.append({
         auth,
         spreadsheetId,
-        range: "Sheet1!A:M",
+        range: "Sheet1!A:N",
         insertDataOption: "OVERWRITE",
         valueInputOption: "USER_ENTERED",
         resource: {
             values:[
-                [lastname, mothersname, childsname, phone, shirt, shirtsize, skirt, skirtsize, jumper, jumpersize, sweatshirt, sweatshirtsize, paid? "TRUE": "FALSE"]
+                [lastname, mothersname, childsname, phone, shirt, shirtsize, skirt, skirtsize, jumper, jumpersize, sweatshirt, sweatshirtsize, paid? "TRUE": "FALSE", partialPayment]
             ]
         },
     });

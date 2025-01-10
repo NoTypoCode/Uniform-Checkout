@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-
     let childcount = 1;
     const maxchildren = 6;
 
@@ -121,7 +120,6 @@ $(document).ready(function () {
 
     });
 
-    let children = [];
 
     function gatherChildren() {
         children = [];
@@ -147,21 +145,25 @@ $(document).ready(function () {
                         quantity: $(`input[name="jumperQuantity${i}"]`).val()
                     }
                 };
+                
                 children.push(childData);
             }
         }
     }
 
+
     $('#preorder-form').on('submit', async function (e) {
         e.preventDefault();
         gatherChildren();
+        
+       
 
         const formData = {
             parentname: $('#ParentName').val().trim(),
             lastname: $('#lastName').val().trim(),
             phone: $('#phone').val().trim(),
             paid: $('#paid').is(':checked'),
-            children
+            children,
         };
 
         for (const child of children) {
@@ -178,7 +180,7 @@ $(document).ready(function () {
                 jumpersize: child.jumpers.quantity > 0 ? child.jumpers.size : "",
                 sweatshirt: child.sweatshirts.quantity > 0 ? child.sweatshirts.quantity : "",
                 sweatshirtsize: child.sweatshirts.quantity > 0 ? child.sweatshirts.size : "",
-                paid: $('#paid').is(':checked')
+                paid: $('#paid').is(':checked'),
             };
 
            
@@ -215,10 +217,7 @@ $(document).ready(function () {
         doc.setLineWidth(1);
         doc.roundedRect(5, 5, pageWidth - 10, pageHeight - 10, 10, 10, "S")
 
-        //reset the line for form underline later
-        doc.setLineWidth(.3);
-
-
+    
         //big font for header
         doc.setFontSize(20);
         let title = "Mrs. Adele Raful Uniform Gemach Order Form"
@@ -233,42 +232,56 @@ $(document).ready(function () {
         //reset font size
         doc.setFontSize(14);
 
+        
         let y = 55;
-        doc.text(`Mothers Name: ${data.parentname}        Child Name: ${data.childname}`, 20, y);
-        //doc.line(20, y+1, pageWidth-90, y+1);
-        y += 10
-
-        // doc.text(`Child Name: ${data.childname}`, 20, y);
-        // doc.line(20, y+1, pageWidth-90, y+1);
-        // y+=10;
-
-
+        doc.text(`Mother's Name: ${data.parentname}`, 20, y);
+        y += 10;
         doc.text(`Phone Number: ${data.phone}`, 20, y);
-        // doc.line(20, y+1, pageWidth-90, y+1);
-        y += 10
+        y += 10;
 
+        const col1X = 20;
+        const col2X = pageWidth / 2;
+        let col1Y = y;
+        let col2Y = y;
+        
+        // children information
+        data.children.forEach((child, index) => {
+            const childInfo = `
+            Child ${index + 1}: ${child.childname}\n
+            Shirts: Size ${child.shirts.size} - Quantity: ${child.shirts.quantity}\n
+            Skirts: Size ${child.skirts.size} - Quantity: ${child.skirts.quantity}\n
+            Sweatshirts: Size ${child.sweatshirts.size} - Quantity: ${child.sweatshirts.quantity}\n
+            Jumpers: Size ${child.jumpers.size} - Quantity: ${child.jumpers.quantity}\n
+        `;
 
-        y += 30;
+            // Check which column to place the next child’s info in
+            if (index % 2 === 0) {
+                // Place in the first column
+                doc.text(childInfo, col1X, col1Y);
+                col1Y += 60; // Increase the Y position for the next child in column 1
+            } else {
+                // Place in the second column
+                doc.text(childInfo, col2X, col2Y);
+                col2Y += 60; // Increase the Y position for the next child in column 2
+            }
 
-        if (data.shirts.quantity > 0) {
-            doc.text(`Shirts : Size ${data.shirts.size} - Quantity: ${data.shirts.quantity}`, 20, y);
-            y += 10;
-        }
+            // Check if content overflows and need a new page
+            // if (col1Y > pageHeight - 50 || col2Y > pageHeight - 50) {
+            //     doc.addPage();
+            //     col1Y = 20;
+            //     col2Y = 20;
+            // }
+        });
 
-        if (data.skirts.quantity > 0) {
-            doc.text(`Skirts : Size ${data.skirts.size} - Quantity: ${data.skirts.quantity}`, 20, y);
-            y += 10;
-        }
-
-        if (data.sweatshirts.quantity > 0) {
-            doc.text(`Sweatshirts : Size ${data.sweatshirts.size} - Quantity: ${data.sweatshirts.quantity}`, 20, y);
-            y += 10;
-        }
-
-        if (data.jumpers.quantity > 0) {
-            doc.text(`Jumpers : Size ${data.jumpers.size} - Quantity: ${data.jumpers.quantity}`, 20, y);
-            y += 10;
-        }
+        //y+=10;
+       
+        
+        // if (partialPayment > 0) {
+        //     doc.text(`Partial Payment: $${data.partialPayment}`,20,y);
+        // y+=5;
+        //doc.text(`Remaining Balance: $${data.totalPrice - data.partialPayment}`,20,y)
+        //}
+        
 
 
         doc.setFont('old_stamper', 'normal').setFontSize(60).setTextColor(255, 0, 0);
@@ -299,7 +312,9 @@ $(document).ready(function () {
         $('#phone').val('');
         $('#paid').prop('checked', false);
         $('.extra-child').remove();
+        $('#partialPayment').val('');
         childcount = 1;
-    }
+    };
 
+    
 })

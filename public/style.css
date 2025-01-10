@@ -64,3 +64,6 @@ button {
 button:hover {
     opacity: .5;
 }
+#partialPayment{
+    width: 60px;
+}
