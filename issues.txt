@@ -1,7 +1,9 @@
 when adding in sizes and quantities...If one of them are blank I want it to not show up in google sheets and not to show up on the pdf
 
-add in price total on bottom of form increase as inputs are put in. ($10 a piece)
+Remove will work as intended but need to delete in order cant remove someone from the middle
 
 partial payment needs to be added to the PDF
 
 find fonts for the PDF?
+
+split functions into diff files. Will make it easier to read/maintain

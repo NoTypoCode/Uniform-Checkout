@@ -43,14 +43,15 @@ $(document).ready(function () {
 
 
         const newchild = `
-        <div class= "extra-child">
+        <div class= "extra-child" id="child-container${childcount}">
         <label for="child${childcount}">Child ${childcount} Name:</label>
                 <input type="text" id="child${childcount}" required><br><br>
+                <button type="button" class="remove-child">Remove Child ${childcount}</button>
                 </div>`;
         $('#children').append(newchild);
 
         const newChildOrder = `
-        <div class="extra-child">
+        <div class="extra-child" id="order-items${childcount}">
                <div id="itemsToOrder${childcount}" class="form-group">
                 <h2 id="childHeader${childcount}">Uniform Items for ${childcount}</h2>
 
@@ -64,7 +65,7 @@ $(document).ready(function () {
                         <option value="10">Size 10</option>
                         <option value="12">Size 12</option>
                     </select>
-                    <input type="number" name="shirtQuantity${childcount}" min="0" max="4" value="0">
+                    <input type="number" name="shirtQuantity${childcount}" min="0" max="4" value="">
                 </div>
 
 
@@ -78,7 +79,7 @@ $(document).ready(function () {
                         <option value="10">Size 10</option>
                         <option value="12">Size 12</option>
                     </select>
-                    <input type="number" name="skirtQuantity${childcount}" min="0" max="4" value="0">
+                    <input type="number" name="skirtQuantity${childcount}" min="0" max="4" value="">
                 </div>
 
                 <div class="uniform-item">
@@ -91,7 +92,7 @@ $(document).ready(function () {
                         <option value="10">Size 10</option>
                         <option value="12">Size 12</option>
                     </select>
-                    <input type="number" name="sweatshirtQuantity${childcount}" min="0" max="4" value="0">
+                    <input type="number" name="sweatshirtQuantity${childcount}" min="0" max="4" value="">
                 </div>
 
                 <div class="uniform-item">
@@ -104,7 +105,7 @@ $(document).ready(function () {
                         <option value="10">Size 10</option>
                         <option value="12">Size 12</option>
                     </select>
-                    <input type="number" name="jumperQuantity${childcount}" min="0" max="4" value="0">
+                    <input type="number" name="jumperQuantity${childcount}" min="0" max="4" value="">
                 </div>
             </div>
             </div>`;
@@ -120,6 +121,12 @@ $(document).ready(function () {
 
     });
 
+    $(document).on('click','.remove-child', function (){
+        const childId = $(this).closest('.extra-child').attr('id').replace('child-container',"");
+        $(`#child-container${childId}`).remove();
+        $(`#order-items${childId}`).remove();
+        childcount--;
+    })
 
     function gatherChildren() {
         children = [];
@@ -151,9 +158,28 @@ $(document).ready(function () {
         }
     }
 
+    
+    const pricePerItem = 10; // all item costs $10
+
+    function updateTotalPrice() {
+        let total = 0;
+        const quantityInputs = $('input[type="number"][name*="Quantity"]');
+        
+        quantityInputs.each(function () {
+            const quantity = parseInt($(this).val()) || 0;
+            total += quantity * pricePerItem;
+        });
+
+        $('#total-price').text(`Total: $${total.toFixed(2)}`);
+    }
+
+    //needs fixing... only resets he price if the 1st child is changed
+    $('[name*="Quantity"]').on('input',updateTotalPrice)
+
 
     $('#preorder-form').on('submit', async function (e) {
         e.preventDefault();
+
         gatherChildren();
         
        
@@ -164,6 +190,8 @@ $(document).ready(function () {
             phone: $('#phone').val().trim(),
             paid: $('#paid').is(':checked'),
             children,
+            totalPrice: $('#total-price').val(),
+            partialPayment: $('#partialPayment').val()
         };
 
         for (const child of children) {
@@ -235,9 +263,8 @@ $(document).ready(function () {
         
         let y = 55;
         doc.text(`Mother's Name: ${data.parentname}`, 20, y);
-        y += 10;
-        doc.text(`Phone Number: ${data.phone}`, 20, y);
-        y += 10;
+        doc.text(`Phone Number: ${data.phone}`, pageWidth/2 , y);
+        y += 20;
 
         const col1X = 20;
         const col2X = pageWidth / 2;
@@ -246,13 +273,21 @@ $(document).ready(function () {
         
         // children information
         data.children.forEach((child, index) => {
-            const childInfo = `
-            Child ${index + 1}: ${child.childname}\n
-            Shirts: Size ${child.shirts.size} - Quantity: ${child.shirts.quantity}\n
-            Skirts: Size ${child.skirts.size} - Quantity: ${child.skirts.quantity}\n
-            Sweatshirts: Size ${child.sweatshirts.size} - Quantity: ${child.sweatshirts.quantity}\n
-            Jumpers: Size ${child.jumpers.size} - Quantity: ${child.jumpers.quantity}\n
-        `;
+            let childInfo = `Child ${index + 1}: ${child.childname}\n`;
+
+            if (child.shirts.size && child.shirts.quantity) {
+                childInfo += `Shirts: Size ${child.shirts.size} - Quantity: ${child.shirts.quantity}\n`
+            }
+            if (child.skirts.size && child.skirts.quantity) {
+                childInfo += `Skirts: Size ${child.skirts.size} - Quantity: ${child.skirts.quantity}\n`
+            }
+            if (child.sweatshirts.size && child.sweatshirts.quantity) {
+                childInfo += `Sweatshirts: Size ${child.sweatshirts.size} - Quantity: ${child.sweatshirts.quantity}\n`
+            }
+            if (child.jumpers.size && child.jumpers.quantity) {
+                childInfo += `Jumpers: Size ${child.jumpers.size} - Quantity: ${child.jumpers.quantity}\n`
+            }
+
 
             // Check which column to place the next child’s info in
             if (index % 2 === 0) {
@@ -265,22 +300,20 @@ $(document).ready(function () {
                 col2Y += 60; // Increase the Y position for the next child in column 2
             }
 
-            // Check if content overflows and need a new page
-            // if (col1Y > pageHeight - 50 || col2Y > pageHeight - 50) {
-            //     doc.addPage();
-            //     col1Y = 20;
-            //     col2Y = 20;
-            // }
+            //Check if content overflows and need a new page
+            if (col1Y > pageHeight - 50 || col2Y > pageHeight - 50) {
+                doc.addPage();
+                col1Y = 20;
+                col2Y = 20;
+            }
         });
 
-        //y+=10;
-       
-        
-        // if (partialPayment > 0) {
-        //     doc.text(`Partial Payment: $${data.partialPayment}`,20,y);
+       //this isnt working have to fix it 
+        // if (data.partialPayment > 0) {
+        //     doc.text(`Partial Payment: $${data.partialPayment}`,20,90);
         // y+=5;
-        //doc.text(`Remaining Balance: $${data.totalPrice - data.partialPayment}`,20,y)
-        //}
+        // doc.text(`Remaining Balance: $${data.totalPrice - data.partialPayment}`,20,95)
+        // }
         
 
 
@@ -288,9 +321,9 @@ $(document).ready(function () {
 
         let paid = "PAID";
         if (data.paid === true) {
-            doc.text(paid, pageWidth / 2, pageHeight / 2, 30, 10);
+            doc.text(paid, pageWidth / 2, pageHeight-40, 30, 10);
         } else {
-            doc.text(`Not Paid`, pageWidth / 2, pageHeight / 2, 30, 10);
+            doc.text(`Not Paid`, pageWidth / 2, pageHeight-40, 30, 10);
         }
         doc.output('dataurlnewwindow', `${data.parentname} ${data.lastname}`)
 
@@ -302,13 +335,13 @@ $(document).ready(function () {
         $('#lastName').val('');
         $(`#order-title`).text(`Uniform Items`);
         $('select[name="skirtSize"]').val('');
-        $('input[name="skirtQuantity"]').val('');
+        $('input[name="skirtQuantity1"]').val('');
         $('select[name="shirtSize"]').val('');
-        $('input[name="shirtQuantity"]').val('');
+        $('input[name="shirtQuantity1"]').val('');
         $('select[name="sweatshirtSize"]').val('');
-        $('input[name="sweatshirtQuantity"]').val('');
+        $('input[name="sweatshirtQuantity1"]').val('');
         $('select[name="jumperSize"]').val('');
-        $('input[name="jumperQuantity"]').val('');
+        $('input[name="jumperQuantity1"]').val('');
         $('#phone').val('');
         $('#paid').prop('checked', false);
         $('.extra-child').remove();
