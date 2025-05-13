@@ -24,8 +24,6 @@ $(document).ready(function () {
         $(`#order-title`).text(`Uniform Items for ${name || `Uniform Items`}`);
     });
 
-
-
     $('#add-child').on('click', () => {
         if (childcount >= maxchildren) {
             alert('Max amount of children reached')
@@ -39,8 +37,6 @@ $(document).ready(function () {
         };
 
         childcount++;
-
-
 
         const newchild = `
         <div class= "extra-child" id="child-container${childcount}">
@@ -145,8 +141,16 @@ $(document).ready(function () {
             $(`select[name="jumperSize${i}"]`).attr('name', `jumperSize${i-1}`);
             $(`input[name="jumperQuantity${i}"]`).attr('name', `jumperQuantity${i-1}`);
             
-            // Update the remove button text
-            $(`.remove-child`).text(`Remove Child ${i-1}`);
+            // Update text content
+            $(`label[for="child${i}"]`).text(`Child ${i-1} Name:`);
+            $(`#childHeader${i-1}`).text(`Uniform Items for Child ${i-1}`);
+            $(`#child-container${i-1} .remove-child`).text(`Remove Child ${i-1}`);
+            
+            // Update the child name in header if it exists
+            const childName = $(`#child${i-1}`).val().trim();
+            if (childName) {
+                $(`#childHeader${i-1}`).text(`Uniform Items for ${childName}`);
+            }
         }
         
         childcount--;
@@ -182,7 +186,6 @@ $(document).ready(function () {
         }
     }
 
-    
     const pricePerItem = 10; // all item costs $10
 
     function updateTotalPrice() {
