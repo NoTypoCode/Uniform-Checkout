@@ -116,17 +116,41 @@ $(document).ready(function () {
             const name = $(this).val().trim();
             $(`#childHeader${childcount}`).text(`Uniform Items for ${name || `Child ${childcount}`}`)
         });
-
-
-
     });
 
-    $(document).on('click','.remove-child', function (){
-        const childId = $(this).closest('.extra-child').attr('id').replace('child-container',"");
-        $(`#child-container${childId}`).remove();
-        $(`#order-items${childId}`).remove();
+    $(document).on('click', '.remove-child', function () {
+        // Find all child containers after the one being removed
+        const removedId = parseInt($(this).closest('.extra-child').attr('id').replace('child-container', ''));
+        
+        // Remove the current child's containers
+        $(`#child-container${removedId}`).remove();
+        $(`#order-items${removedId}`).remove();
+        
+        // Renumber remaining children
+        for (let i = removedId + 1; i <= childcount; i++) {
+            // Update container IDs and content
+            $(`#child-container${i}`).attr('id', `child-container${i-1}`);
+            $(`#child${i}`).attr('id', `child${i-1}`);
+            $(`#order-items${i}`).attr('id', `order-items${i-1}`);
+            $(`#itemsToOrder${i}`).attr('id', `itemsToOrder${i-1}`);
+            $(`#childHeader${i}`).attr('id', `childHeader${i-1}`);
+            
+            // Update form elements
+            $(`select[name="shirtSize${i}"]`).attr('name', `shirtSize${i-1}`);
+            $(`input[name="shirtQuantity${i}"]`).attr('name', `shirtQuantity${i-1}`);
+            $(`select[name="skirtSize${i}"]`).attr('name', `skirtSize${i-1}`);
+            $(`input[name="skirtQuantity${i}"]`).attr('name', `skirtQuantity${i-1}`);
+            $(`select[name="sweatshirtSize${i}"]`).attr('name', `sweatshirtSize${i-1}`);
+            $(`input[name="sweatshirtQuantity${i}"]`).attr('name', `sweatshirtQuantity${i-1}`);
+            $(`select[name="jumperSize${i}"]`).attr('name', `jumperSize${i-1}`);
+            $(`input[name="jumperQuantity${i}"]`).attr('name', `jumperQuantity${i-1}`);
+            
+            // Update the remove button text
+            $(`.remove-child`).text(`Remove Child ${i-1}`);
+        }
+        
         childcount--;
-    })
+    });
 
     function gatherChildren() {
         children = [];
@@ -171,18 +195,18 @@ $(document).ready(function () {
         });
 
         $('#total-price').text(`Total: $${total.toFixed(2)}`);
+        return total;
     }
 
-    //needs fixing... only resets he price if the 1st child is changed
-    $('[name*="Quantity"]').on('input',updateTotalPrice)
-
+    // Fix price update for all children
+    $(document).on('input', '[name*="Quantity"]', updateTotalPrice);
 
     $('#preorder-form').on('submit', async function (e) {
         e.preventDefault();
 
         gatherChildren();
-        
-       
+        const totalPrice = updateTotalPrice();
+        const partialPayment = parseFloat($('#partialPayment').val()) || 0;
 
         const formData = {
             parentname: $('#ParentName').val().trim(),
@@ -190,8 +214,8 @@ $(document).ready(function () {
             phone: $('#phone').val().trim(),
             paid: $('#paid').is(':checked'),
             children,
-            totalPrice: $('#total-price').val(),
-            partialPayment: $('#partialPayment').val()
+            totalPrice: totalPrice,
+            partialPayment: partialPayment
         };
 
         for (const child of children) {
@@ -200,18 +224,17 @@ $(document).ready(function () {
                 mothersname: $('#ParentName').val().trim(),
                 childsname: child.childname,
                 phone: $('#phone').val().trim(),
-                shirt: child.shirts.quantity > 0 ? child.shirts.quantity : "",
-                shirtsize: child.shirts.quantity > 0 ? child.shirts.size : "",
-                skirt: child.skirts.quantity > 0 ? child.skirts.quantity : "",
-                skirtsize: child.skirts.quantity > 0 ? child.skirts.size : "",
-                jumper: child.jumpers.quantity > 0 ? child.jumpers.quantity : "",
-                jumpersize: child.jumpers.quantity > 0 ? child.jumpers.size : "",
-                sweatshirt: child.sweatshirts.quantity > 0 ? child.sweatshirts.quantity : "",
-                sweatshirtsize: child.sweatshirts.quantity > 0 ? child.sweatshirts.size : "",
+                shirt: child.shirts.quantity && child.shirts.size ? child.shirts.quantity : "",
+                shirtsize: child.shirts.quantity && child.shirts.size ? child.shirts.size : "",
+                skirt: child.skirts.quantity && child.skirts.size ? child.skirts.quantity : "",
+                skirtsize: child.skirts.quantity && child.skirts.size ? child.skirts.size : "",
+                jumper: child.jumpers.quantity && child.jumpers.size ? child.jumpers.quantity : "",
+                jumpersize: child.jumpers.quantity && child.jumpers.size ? child.jumpers.size : "",
+                sweatshirt: child.sweatshirts.quantity && child.sweatshirts.size ? child.sweatshirts.quantity : "",
+                sweatshirtsize: child.sweatshirts.quantity && child.sweatshirts.size ? child.sweatshirts.size : "",
                 paid: $('#paid').is(':checked'),
+                partialPayment: partialPayment
             };
-
-           
 
             try {
                 const response = await fetch('/', {
@@ -288,8 +311,7 @@ $(document).ready(function () {
                 childInfo += `Jumpers: Size ${child.jumpers.size} - Quantity: ${child.jumpers.quantity}\n`
             }
 
-
-            // Check which column to place the next child’s info in
+            // Check which column to place the next child's info in
             if (index % 2 === 0) {
                 // Place in the first column
                 doc.text(childInfo, col1X, col1Y);
@@ -308,14 +330,23 @@ $(document).ready(function () {
             }
         });
 
-       //this isnt working have to fix it 
-        // if (data.partialPayment > 0) {
-        //     doc.text(`Partial Payment: $${data.partialPayment}`,20,90);
-        // y+=5;
-        // doc.text(`Remaining Balance: $${data.totalPrice - data.partialPayment}`,20,95)
-        // }
-        
+        // Add payment information
+        let paymentY = Math.max(col1Y, col2Y) + 10;
+        if (paymentY > pageHeight - 60) {
+            doc.addPage();
+            paymentY = 30;
+        }
 
+        doc.setFontSize(16);
+        doc.text(`Total Amount: $${data.totalPrice.toFixed(2)}`, 20, paymentY);
+        
+        if (data.partialPayment > 0) {
+            paymentY += 10;
+            doc.text(`Partial Payment: $${data.partialPayment.toFixed(2)}`, 20, paymentY);
+            paymentY += 10;
+            const remaining = data.totalPrice - data.partialPayment;
+            doc.text(`Remaining Balance: $${remaining.toFixed(2)}`, 20, paymentY);
+        }
 
         doc.setFont('old_stamper', 'normal').setFontSize(60).setTextColor(255, 0, 0);
 
@@ -326,7 +357,6 @@ $(document).ready(function () {
             doc.text(`Not Paid`, pageWidth / 2, pageHeight-40, 30, 10);
         }
         doc.output('dataurlnewwindow', `${data.parentname} ${data.lastname}`)
-
     }
 
     function resetFormFields() {
@@ -346,8 +376,7 @@ $(document).ready(function () {
         $('#paid').prop('checked', false);
         $('.extra-child').remove();
         $('#partialPayment').val('');
+        $('#total-price').text('');
         childcount = 1;
-    };
-
-    
-})
+    }
+});
