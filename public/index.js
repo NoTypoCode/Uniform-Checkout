@@ -157,6 +157,7 @@ $(document).ready(function () {
 
         childcount--;
     });
+    });
 
     function gatherChildren() {
         children = [];
@@ -220,6 +221,8 @@ $(document).ready(function () {
         gatherChildren();
         const totalPrice = updateTotalPrice();
         const partialPayment = parseFloat($('#partialPayment').val()) || 0;
+        const totalPrice = updateTotalPrice();
+        const partialPayment = parseFloat($('#partialPayment').val()) || 0;
 
         const formData = {
             parentname: $('#ParentName').val().trim(),
@@ -227,6 +230,8 @@ $(document).ready(function () {
             phone: $('#phone').val().trim(),
             paid: $('#paid').is(':checked'),
             children,
+            totalPrice: totalPrice,
+            partialPayment: partialPayment
             totalPrice: totalPrice,
             partialPayment: partialPayment
         };
@@ -331,6 +336,7 @@ $(document).ready(function () {
             }
 
             // Check which column to place the next child's info in
+            // Check which column to place the next child's info in
             if (index % 2 === 0) {
                 // Place in the first column
                 doc.text(childInfo, col1X, col1Y);
@@ -395,6 +401,7 @@ $(document).ready(function () {
         $('#paid').prop('checked', false);
         $('.extra-child').remove();
         $('#partialPayment').val('');
+        $('#total-price').text('');
         $('#total-price').text('');
         childcount = 1;
     }
