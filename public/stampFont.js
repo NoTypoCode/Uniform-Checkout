@@ -4,5 +4,4 @@ var callAddFont = function () {
     this.addFileToVFS('old_stamper.ttf', stampfont);
     this.addFont('old_stamper.ttf', 'old_stamper', 'normal');
 };
-const { jsPDF } = window.jspdf;
 jsPDF.API.events.push(['initialized', callAddFont])

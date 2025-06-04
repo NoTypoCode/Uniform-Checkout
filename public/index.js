@@ -21,7 +21,7 @@ $(document).ready(function () {
 
     $('#child1').on('input', function () {
         const name = $(this).val().trim();
-        $(`#order-title`).text(`Uniform Items for ${name || `Uniform Items`}`);
+        $(`#order-title`).text(`Uniform Items for ${capitalizeWords(name) || `Uniform Items`}`);
     });
 
     $('#add-child').on('click', () => {
@@ -112,7 +112,7 @@ $(document).ready(function () {
 
         $(`#child${childcount}`).on('input', function () {
             const name = $(this).val().trim();
-            $(`#childHeader${childcount}`).text(`Uniform Items for ${name || `Child ${childcount}`}`)
+            $(`#childHeader${childcount}`).text(`Uniform Items for ${capitalizeWords(name) || `Child ${childcount}`}`)
         });
     });
 
@@ -289,23 +289,28 @@ $(document).ready(function () {
 
 
         //big font for header
-        doc.setFontSize(20);
+        doc.setFont('Rapunled', 'normal').setFontSize(20);
         let title = "Mrs. Adele Raful Uniform Gemach Order Form"
         let titleWidth = doc.getTextWidth(title);
         doc.text(title, (pageWidth - titleWidth) / 2, 20);
 
+        doc.setFont('times','normal').setFontSize(18);
         let lastname = capitalizeWords(data.lastname);
-        let lastnameWidth = doc.getTextWidth(lastname);
-        doc.text(lastname, (pageWidth - lastnameWidth) / 2, 35);
+        let mothersname = capitalizeWords(data.parentname);
+        let fullname = `${mothersname} ${lastname}`;
+        let nameWidth = doc.getTextWidth(fullname);
+        doc.text(fullname, (pageWidth - nameWidth) / 2, 35);
 
 
         //reset font size
-        doc.setFontSize(14);
+        doc.setFontSize(18);
 
 
         let y = 55;
-        doc.text(`Mother's Name: ${capitalizeWords(data.parentname)}`, 20, y);
-        doc.text(`Phone Number: ${data.phone}`, pageWidth / 2, y);
+        let phonetext = `Phone Number: ${data.phone}`;
+        let phoneWidth = doc.getTextWidth(phonetext);
+
+        doc.text(phonetext, (pageWidth - phoneWidth) / 2, y);
         y += 20;
 
         const col1X = 20;
@@ -315,19 +320,19 @@ $(document).ready(function () {
 
         // children information
         data.children.forEach((child, index) => {
-            let childInfo = [`Child ${index + 1}: ${capitalizeWords(child.childname)}\n`];
+            let childInfo = [`Child ${index + 1}: ${capitalizeWords(child.childname)}\n\n`];
 
             if (child.shirts.size && child.shirts.quantity) {
-                childInfo += `Shirts: Size ${child.shirts.size} - Quantity: ${child.shirts.quantity}\n`
+                childInfo += `Shirts: Size ${child.shirts.size} - Quantity: ${child.shirts.quantity}\n\n`
             }
             if (child.skirts.size && child.skirts.quantity) {
-                childInfo += `Skirts: Size ${child.skirts.size} - Quantity: ${child.skirts.quantity}\n`
+                childInfo += `Skirts: Size ${child.skirts.size} - Quantity: ${child.skirts.quantity}\n\n`
             }
             if (child.sweatshirts.size && child.sweatshirts.quantity) {
-                childInfo += `Sweatshirts: Size ${child.sweatshirts.size} - Quantity: ${child.sweatshirts.quantity}\n`
+                childInfo += `Sweatshirts: Size ${child.sweatshirts.size} - Quantity: ${child.sweatshirts.quantity}\n\n`
             }
             if (child.jumpers.size && child.jumpers.quantity) {
-                childInfo += `Jumpers: Size ${child.jumpers.size} - Quantity: ${child.jumpers.quantity}\n`
+                childInfo += `Jumpers: Size ${child.jumpers.size} - Quantity: ${child.jumpers.quantity}\n\n`
             }
 
             // Check which column to place the next child's info in
@@ -375,6 +380,7 @@ $(document).ready(function () {
         } else {
             doc.text(`Not Paid`, pageWidth / 2, pageHeight - 40, 30, 10);
         }
+
         doc.output('dataurlnewwindow', `${data.parentname} ${data.lastname}`)
     }
 
