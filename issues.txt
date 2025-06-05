@@ -1,5 +1,4 @@
 when adding in sizes and quantities...If one of them are blank I want it to not show up in google sheets and not to show up on the pdf
 
-find fonts for the PDF?
 
 split functions into diff files. Will make it easier to read/maintain

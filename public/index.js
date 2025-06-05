@@ -57,11 +57,12 @@ $(document).ready(function () {
                     <label>Shirts</label>
                     <select name="shirtSize${childcount}" id="shirtSize${childcount}">
                         <option value="" style="display: none;">Select Size</option>
-                        <option value="4">Size 4</option>
                         <option value="6">Size 6</option>
                         <option value="8">Size 8</option>
                         <option value="10">Size 10</option>
                         <option value="12">Size 12</option>
+                        <option value="14">Size 14</option>
+                        <option value="16">Size 16</option>
                     </select>
                     <input type="number" name="shirtQuantity${childcount}" min="0" max="4" value="">
                 </div>
@@ -70,12 +71,28 @@ $(document).ready(function () {
                 <div class="uniform-item">
                     <label>Skirts</label>
                     <select name="skirtSize${childcount}" id="skirtSize${childcount}">
-                        <option value="" style="display: none;">Select Size</option>
-                        <option value="4">Size 4</option>
+                       <option value="" style="display: none;">Select Size</option>
+                        <option value="5">Size 5</option>
+                        <option value="5L">Size 5L</option>
                         <option value="6">Size 6</option>
+                        <option value="6L">Size 6L</option>
+                        <option value="6XL">Size 6XL</option>
+                        <option value="7">Size 7</option>
+                        <option value="7L">Size 7L</option>
                         <option value="8">Size 8</option>
+                        <option value="8L">Size 8L</option>
                         <option value="10">Size 10</option>
+                        <option value="10L">Size 10L</option>
                         <option value="12">Size 12</option>
+                        <option value="12L">Size 12L</option>
+                        <option value="1205L">Size 12.5L</option>
+                        <option value="14">Size 14</option>
+                        <option value="14L">Size 14L</option>
+                        <option value="14.5L">Size 14.5L</option>
+                        <option value="16L">Size 16L</option>
+                        <option value="16.5L">Size 16.5L</option>
+                        <option value="18L">Size 18L</option>
+                        <option value="18.5L">Size 18.5L</option>
                     </select>
                     <input type="number" name="skirtQuantity${childcount}" min="0" max="4" value="">
                 </div>
@@ -84,11 +101,10 @@ $(document).ready(function () {
                     <label>Sweatshirts</label>
                     <select name="sweatshirtSize${childcount}" id="sweathirtSize${childcount}">
                         <option value="" style="display: none;">Select Size</option>
-                        <option value="4">Size 4</option>
-                        <option value="6">Size 6</option>
-                        <option value="8">Size 8</option>
-                        <option value="10">Size 10</option>
-                        <option value="12">Size 12</option>
+                        <option value="5/6">Size 5/6</option>
+                        <option value="7/8">Size 7/8</option>
+                        <option value="10/12">Size 10/12</option>
+                        <option value="14/16">Size 14/16</option>
                     </select>
                     <input type="number" name="sweatshirtQuantity${childcount}" min="0" max="4" value="">
                 </div>
@@ -97,11 +113,14 @@ $(document).ready(function () {
                     <label>Jumpers</label>
                     <select name="jumperSize${childcount}" id="jumperSize${childcount}">
                         <option value="" style="display: none;">Select Size</option>
-                        <option value="4">Size 4</option>
+                        <option value="5">Size 5</option>
                         <option value="6">Size 6</option>
+                        <option value="6X">Size 6X</option>
+                        <option value="7">Size 7</option>
                         <option value="8">Size 8</option>
                         <option value="10">Size 10</option>
                         <option value="12">Size 12</option>
+                        <option value="14">Size 14</option>
                     </select>
                     <input type="number" name="jumperQuantity${childcount}" min="0" max="4" value="">
                 </div>
@@ -188,7 +207,7 @@ $(document).ready(function () {
         }
     }
 
-    const pricePerItem = 10; // all item costs $10 for now
+    const pricePerItem = 15; // all item costs $15
 
     function updateTotalPrice() {
         let total = 0;
@@ -288,22 +307,19 @@ $(document).ready(function () {
         doc.roundedRect(5, 5, pageWidth - 10, pageHeight - 10, 10, 10, "S")
 
 
-        //big font for header
+        //Fancy and big font for header
         doc.setFont('Rapunled', 'normal').setFontSize(20);
         let title = "Mrs. Adele Raful Uniform Gemach Order Form"
         let titleWidth = doc.getTextWidth(title);
         doc.text(title, (pageWidth - titleWidth) / 2, 20);
 
-        doc.setFont('times','normal').setFontSize(18);
+        //Reset font to normal
+        doc.setFont('times', 'normal').setFontSize(18);
         let lastname = capitalizeWords(data.lastname);
         let mothersname = capitalizeWords(data.parentname);
         let fullname = `${mothersname} ${lastname}`;
         let nameWidth = doc.getTextWidth(fullname);
         doc.text(fullname, (pageWidth - nameWidth) / 2, 35);
-
-
-        //reset font size
-        doc.setFontSize(18);
 
 
         let y = 55;
@@ -400,7 +416,7 @@ $(document).ready(function () {
         $('#phone').val('');
         $('#paid').prop('checked', false);
         $('.extra-child').remove();
-        $('#partialPayment').val('');
+        $('#partialPayment').prop("disabled", false).val('');
         $('#total-price').text('');
         childcount = 1;
     }
