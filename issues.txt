@@ -1,4 +1,7 @@
 when adding in sizes and quantities...If one of them are blank I want it to not show up in google sheets and not to show up on the pdf
 
+total price is adding when no size is selected
+
+need to make sure partial payment cant exceed total
 
 split functions into diff files. Will make it easier to read/maintain

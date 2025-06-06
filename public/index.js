@@ -99,7 +99,7 @@ $(document).ready(function () {
 
                 <div class="uniform-item">
                     <label>Sweatshirts</label>
-                    <select name="sweatshirtSize${childcount}" id="sweathirtSize${childcount}">
+                    <select name="sweatshirtSize${childcount}" id="sweatshirtSize${childcount}">
                         <option value="" style="display: none;">Select Size</option>
                         <option value="5/6">Size 5/6</option>
                         <option value="7/8">Size 7/8</option>
@@ -193,7 +193,7 @@ $(document).ready(function () {
                         quantity: $(`input[name="shirtQuantity${i}"]`).val()
                     },
                     sweatshirts: {
-                        size: $(`#sweathirtSize${i}`).val(),
+                        size: $(`#sweatshirtSize${i}`).val(),
                         quantity: $(`input[name="sweatshirtQuantity${i}"]`).val()
                     },
                     jumpers: {
